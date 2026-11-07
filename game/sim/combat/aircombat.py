@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import random
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
@@ -11,6 +10,7 @@ from game.ato.flightstate import InCombat, InFlight
 from game.settings.settings import CombatResolutionMethod
 from game.utils import dcs_to_shapely_point
 from .joinablecombat import JoinableCombat
+from .resolution import resolve_air_combat
 from .. import GameUpdateEvents
 
 if TYPE_CHECKING:
@@ -77,37 +77,13 @@ class AirCombat(JoinableCombat):
                 flight.state.exit_combat(events, time, elapsed_time)
             return
 
-        blue = []
-        red = []
+        losses = resolve_air_combat(self.flights)
+        logging.debug(
+            f"{self} auto-resolved with losses: "
+            + ", ".join(f"{f}: {n}" for f, n in losses.items())
+        )
         for flight in self.flights:
-            if flight.squadron.player.is_blue:
-                blue.append(flight)
-            else:
-                red.append(flight)
-        if len(blue) > len(red):
-            winner = blue
-            loser = red
-        elif len(blue) < len(red):
-            winner = red
-            loser = blue
-        elif random.random() >= 0.5:
-            winner = blue
-            loser = red
-        else:
-            winner = red
-            loser = blue
-
-        if winner == blue:
-            logging.debug(f"{self} auto-resolved as blue victory")
-        else:
-            logging.debug(f"{self} auto-resolved as red victory")
-
-        for flight in loser:
-            flight.kill(results, events)
-
-        for flight in winner:
-            assert isinstance(flight.state, InCombat)
-            if random.random() >= 0.5:
-                flight.kill(results, events)
-            else:
+            flight.kill_members(losses.get(flight, 0), results, events)
+            if flight.alive:
+                assert isinstance(flight.state, InCombat)
                 flight.state.exit_combat(events, time, elapsed_time)

@@ -71,6 +71,17 @@ class FlightMembers(IFlightRoster):
             member.use_custom_loadout = loadout.is_custom
             self.members.append(member)
 
+    def remove_member(self, member: FlightMember) -> None:
+        """Removes a member that was lost in combat.
+
+        Unlike resize(), the member's pilot is *not* returned to the squadron. The
+        pilot is still claimed by this flight until the end of the turn, when the loss
+        is committed and the pilot is killed (or not, if invulnerable).
+        """
+        self.members.remove(member)
+        if (code := member.tgp_laser_code) is not None:
+            code.release()
+
     def set_pilot(self, index: int, pilot: Optional[Pilot]) -> None:
         if pilot is not None:
             self.flight.squadron.claim_pilot(pilot)

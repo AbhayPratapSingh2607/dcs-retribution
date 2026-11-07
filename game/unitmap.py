@@ -36,7 +36,8 @@ class FrontLineUnit:
 @dataclass(frozen=True)
 class TheaterUnitMapping:
     theater_unit: TheaterUnit
-    dcs_unit: Unit
+    #: None for units destroyed by auto-resolved combat, which were never spawned.
+    dcs_unit: Optional[Unit]
 
 
 @dataclass(frozen=True)

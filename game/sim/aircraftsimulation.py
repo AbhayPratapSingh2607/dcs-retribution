@@ -9,7 +9,7 @@ from typing_extensions import TYPE_CHECKING
 
 from game.ato.flightstate import Uninitialized, Completed, InCombat
 from game.settings.settings import FastForwardStopCondition, CombatResolutionMethod
-from .combat import CombatInitiator, FrozenCombat
+from .combat import CombatInitiator, CombatMemory, FrozenCombat
 from .simulationresults import SimulationResults
 
 if TYPE_CHECKING:
@@ -22,6 +22,7 @@ class AircraftSimulation:
     def __init__(self, game: Game) -> None:
         self.game = game
         self.combats: list[FrozenCombat] = []
+        self.combat_memory = CombatMemory()
         self.results = SimulationResults()
 
     def begin_simulation(self) -> None:
@@ -66,7 +67,9 @@ class AircraftSimulation:
 
         # Finish updating all flights before checking for combat so that the new
         # positions are used.
-        CombatInitiator(self.game, self.combats, events).update_active_combats()
+        CombatInitiator(
+            self.game, self.combats, events, self.combat_memory
+        ).update_active_combats()
 
         # After updating all combat states, check for halts.
         for flight in self.iter_flights():
@@ -94,6 +97,7 @@ class AircraftSimulation:
             flight.state.reinitialize(now)
 
     def reset(self) -> None:
+        self.combat_memory = CombatMemory()
         for flight in self.iter_flights():
             flight.set_state(Uninitialized(flight, self.game.settings))
 

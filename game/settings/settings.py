@@ -873,13 +873,17 @@ class Settings:
         default=CombatResolutionMethod.PAUSE,
         choices={
             "Pause": CombatResolutionMethod.PAUSE,
-            "Resolving combat (WIP)": CombatResolutionMethod.RESOLVE,
+            "Resolving combat": CombatResolutionMethod.RESOLVE,
             "Skipping combat": CombatResolutionMethod.SKIP,
         },
         detail=(
             "Determines what happens when combat occurs when fast forwarding. "
             "Pause: pause fast forward and generate mission. Fast forwarding may stop before the condition specified in the above setting. "
-            "Resolving combat (WIP): auto resolve combat. This method is very rudimentary and will result in large losses. "
+            "Resolving combat: auto resolve combat. Air-to-air outcomes depend on the number, "
+            "air-to-air capability and role of the aircraft involved and on pilot experience. "
+            "Air defense losses depend on the number and type of SAM sites and on SEAD support. "
+            "Individual aircraft can be lost without losing the whole flight. AI flights that "
+            "reach their IP may destroy units of their target. "
             "Skipping combat: skip combat as if it did not occur."
         ),
     )

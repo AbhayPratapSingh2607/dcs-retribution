@@ -343,14 +343,43 @@ class Flight(
         # This does leave an opportunity for players to cheat since the UI won't stop
         # them from cancelling a dead flight, returning the aircraft to the pool. Not a
         # big deal for now.
-        # TODO: Support partial kills.
+        #
+        # Partial losses are handled by kill_members().
         self.set_state(
             Killed(self.state.estimate_position(), self, self.squadron.settings)
         )
         events.update_flight(self)
         for pilot in self.roster.iter_pilots():
-            if pilot is not None:
-                results.kill_pilot(self, pilot)
+            # Aircraft without an assigned pilot are still lost.
+            results.kill_pilot(self, pilot)
+
+    def kill_members(
+        self, count: int, results: SimulationResults, events: GameUpdateEvents
+    ) -> int:
+        """Kills up to count aircraft from this flight.
+
+        AI members are lost before player members, and later members (wingmen) before
+        the flight lead. Lost members are removed from the roster so they are not
+        spawned when the mission is generated, and the loss is logged in the
+        simulation results so it is committed with the debriefing. If no members
+        remain the whole flight is killed.
+
+        Returns the number of aircraft killed.
+        """
+        if count <= 0 or not self.alive:
+            return 0
+        if count >= self.count:
+            killed = self.count
+            self.kill(results, events)
+            return killed
+
+        # Stable sort: AI before players, then reverse roster order.
+        victims = sorted(reversed(self.roster.members), key=lambda m: m.is_player)
+        for member in victims[:count]:
+            self.roster.remove_member(member)
+            results.kill_pilot(self, member.pilot)
+        events.update_flight(self)
+        return count
 
     def recreate_flight_plan(self, dump_debug_info: bool = False) -> None:
         self._flight_plan_builder.regenerate(dump_debug_info)

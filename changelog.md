@@ -7,6 +7,8 @@
 * **[UX]** Press Delete with a package selected in the Packages list to cancel it, making it quick to clear several packages in a row.
 * **[UX]** Avoid having escorts from wondering off too far while chasing a target.
 * **[UX]** Improved fast-forward settings with the ability to skip combat.
+* **[Simulation]** Smarter combat resolution when fast forwarding. Air-to-air outcomes now depend on the number, air-to-air capability and role of the aircraft involved and on pilot experience; SAM losses depend on the number and type of threatening sites and on SEAD support; individual aircraft can be lost without losing the whole flight; and AI strike, BAI, SEAD/DEAD, anti-ship and runway flights that reach their IP now damage their target. A SAM site or enemy flight no longer re-engages the same flight every minute.
+* **[Simulation]** Fixed fast forward not checking some flights for combat while another combat was in progress.
 * **[Data]** Add Refueling/Recovery tasks to A-6E Intruder mod
 * **[Modding]** Add CurrentHill UK Assets Pack support (v1.1.2)
 * **[Layouts]** Add signature to layouts' binary file for automatic reloading of updated layouts.

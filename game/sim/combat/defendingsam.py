@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import random
 from collections.abc import Iterator
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
@@ -9,6 +8,7 @@ from typing import TYPE_CHECKING
 from game.ato.flightstate import InCombat
 from game.settings.settings import CombatResolutionMethod
 from .frozencombat import FrozenCombat
+from .resolution import resolve_sam_engagement
 from .. import GameUpdateEvents
 
 if TYPE_CHECKING:
@@ -52,11 +52,12 @@ class DefendingSam(FrozenCombat):
             self.flight.state.exit_combat(events, time, elapsed_time)
             return
 
-        if random.random() >= 0.5:
-            logging.debug(f"Air defense combat auto-resolved with {self.flight} lost")
-            self.flight.kill(results, events)
-        else:
-            logging.debug(
-                f"Air defense combat auto-resolved with {self.flight} surviving"
-            )
+        losses = self.flight.kill_members(
+            resolve_sam_engagement(self.flight, self.air_defenses), results, events
+        )
+        logging.debug(
+            f"Air defense combat auto-resolved with {self.flight} losing {losses} "
+            "aircraft"
+        )
+        if self.flight.alive:
             self.flight.state.exit_combat(events, time, elapsed_time)

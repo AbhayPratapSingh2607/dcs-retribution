@@ -412,6 +412,8 @@ class MissionGenerator:
     def generate_warehouses(self) -> None:
         settings = self.game.settings
         for tmu in self.unit_map.theater_objects.values():
+            # Every unit in the unit map was spawned, so has a DCS unit.
+            assert tmu.dcs_unit is not None
             if (
                 tmu.theater_unit.is_ship
                 or isinstance(tmu.dcs_unit, Static)

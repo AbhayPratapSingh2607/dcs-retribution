@@ -184,11 +184,32 @@ class Debriefing:
         self.base_captures = self.base_capture_events()
 
     def merge_simulation_results(self, results: SimulationResults) -> None:
+        from game.unitmap import TheaterUnitMapping
+
         for air_loss in results.air_losses:
             if air_loss.flight.squadron.player.is_blue:
                 self.air_losses.player.append(air_loss)
             else:
                 self.air_losses.enemy.append(air_loss)
+
+        already_dead = {m.theater_unit.id for m in self.ground_object_losses}
+        for unit in results.ground_object_losses:
+            if unit.id in already_dead:
+                continue
+            already_dead.add(unit.id)
+            mapping = TheaterUnitMapping(unit, None)
+            if unit.ground_object.is_friendly(Player.BLUE):
+                self.ground_losses.player_ground_objects.append(mapping)
+            else:
+                self.ground_losses.enemy_ground_objects.append(mapping)
+
+        for airfield in results.damaged_runways:
+            if airfield in self.damaged_runways:
+                continue
+            if airfield.captured.is_blue:
+                self.ground_losses.player_airfields.append(airfield)
+            else:
+                self.ground_losses.enemy_airfields.append(airfield)
 
     @property
     def front_line_losses(self) -> Iterator[FrontLineUnit]:
