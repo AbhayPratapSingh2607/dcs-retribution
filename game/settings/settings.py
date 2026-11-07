@@ -887,6 +887,19 @@ class Settings:
             "Skipping combat: skip combat as if it did not occur."
         ),
     )
+    fast_forward_resolve_ground_war: bool = boolean_option(
+        "Resolve front line combat when fast forwarding",
+        page=MISSION_GENERATOR_PAGE,
+        section=GAMEPLAY_SECTION,
+        default=True,
+        detail=(
+            "Only applies when resolving combat. Front line ground forces fight while "
+            "fast forwarding, so the mission starts with the survivors. Outcomes "
+            "depend on the number, type and quality of the units involved and on "
+            "each side's stance. Losses count toward the front line result at the "
+            "end of the turn."
+        ),
+    )
     supercarrier: bool = boolean_option(
         "Use supercarrier module",
         MISSION_GENERATOR_PAGE,

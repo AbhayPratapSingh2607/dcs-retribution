@@ -11,6 +11,7 @@ from game.missiongenerator import MissionGenerator
 from game.settings.settings import FastForwardStopCondition, CombatResolutionMethod
 from game.unitmap import UnitMap
 from .aircraftsimulation import AircraftSimulation
+from .groundwarsimulation import GroundWarSimulation
 from .missionresultsprocessor import MissionResultsProcessor
 from ..profiling import logged_duration
 
@@ -32,6 +33,9 @@ class MissionSimulation:
         self.game = game
         self.unit_map: Optional[UnitMap] = None
         self.aircraft_simulation = AircraftSimulation(self.game)
+        self.ground_war_simulation = GroundWarSimulation(
+            self.game, self.aircraft_simulation.results
+        )
         self.completed = False
         self.time = self.game.conditions.start_time
         self.miz_generated_at: float = 0.0
@@ -39,6 +43,9 @@ class MissionSimulation:
     def begin_simulation(self) -> None:
         self.time = self.game.conditions.start_time
         self.aircraft_simulation.begin_simulation()
+        self.ground_war_simulation = GroundWarSimulation(
+            self.game, self.aircraft_simulation.results
+        )
 
     def tick(
         self,
@@ -73,6 +80,7 @@ class MissionSimulation:
         self.aircraft_simulation.on_game_tick(
             events, self.time, TICK, combat_resolution_method, force_continue
         )
+        self.ground_war_simulation.on_game_tick(TICK, combat_resolution_method)
         self.completed = events.simulation_complete
         return events
 

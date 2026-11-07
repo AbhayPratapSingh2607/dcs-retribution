@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional, TYPE_CHECKING
 
-from game.unitmap import FlyingUnit
+from game.unitmap import FlyingUnit, FrontLineUnit
 
 if TYPE_CHECKING:
     from game.ato import Flight
@@ -27,9 +27,16 @@ class SimulationResults:
     #: Runways cratered by auto-resolved OCA/Runway strikes. Runway damage is
     #: applied when the debriefing is committed.
     damaged_runways: list[Airfield] = field(default_factory=list)
+    #: Front line units destroyed by auto-resolved ground combat or CAS. These are
+    #: removed from the planned combat groups immediately (so they are not spawned)
+    #: and the losses are committed with the debriefing.
+    front_line_losses: list[FrontLineUnit] = field(default_factory=list)
 
     def kill_pilot(self, flight: Flight, pilot: Optional[Pilot]) -> None:
         self.air_losses.append(FlyingUnit(flight, pilot))
+
+    def kill_front_line_unit(self, unit: FrontLineUnit) -> None:
+        self.front_line_losses.append(unit)
 
     def kill_ground_object_unit(self, unit: TheaterUnit) -> None:
         self.ground_object_losses.append(unit)

@@ -8,6 +8,7 @@
 * **[UX]** Avoid having escorts from wondering off too far while chasing a target.
 * **[UX]** Improved fast-forward settings with the ability to skip combat.
 * **[Simulation]** Smarter combat resolution when fast forwarding. Air-to-air outcomes now depend on the number, air-to-air capability and role of the aircraft involved and on pilot experience; SAM losses depend on the number and type of threatening sites and on SEAD support; individual aircraft can be lost without losing the whole flight; and AI strike, BAI, SEAD/DEAD, anti-ship and runway flights that reach their IP now damage their target. A SAM site or enemy flight no longer re-engages the same flight every minute.
+* **[Simulation]** Front line combat is resolved when fast forwarding with combat resolution enabled (new option, on by default). Ground forces fight every 10 simulated minutes, with outcomes depending on the number, type, quality and era of the units and each side's stance; the mission then spawns the survivors and losses count toward the front line result. AI CAS flights that reach their IP attack enemy front line units and can be shot down by front line air defenses.
 * **[Simulation]** Fixed fast forward not checking some flights for combat while another combat was in progress.
 * **[Data]** Add Refueling/Recovery tasks to A-6E Intruder mod
 * **[Modding]** Add CurrentHill UK Assets Pack support (v1.1.2)

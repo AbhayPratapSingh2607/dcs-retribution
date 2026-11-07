@@ -203,6 +203,17 @@ class Debriefing:
             else:
                 self.ground_losses.enemy_ground_objects.append(mapping)
 
+        # Front line losses can't be deduplicated (units of the same type from the
+        # same origin are indistinguishable), so only merge them once.
+        if not getattr(self, "_merged_front_line_losses", False):
+            self._merged_front_line_losses = True
+            for front_line_unit in results.front_line_losses:
+                if front_line_unit.origin.captured.is_blue:
+                    self.ground_losses.player_front_line.append(front_line_unit)
+                else:
+                    self.ground_losses.enemy_front_line.append(front_line_unit)
+            self.__dict__.pop("_casualties_by_origin", None)
+
         for airfield in results.damaged_runways:
             if airfield in self.damaged_runways:
                 continue
